@@ -3,66 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>අවුරුදු උත්සව සෙවුම 2026</title>
+    <title>🌞 අවුරුදු උත්සව Map 2026</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        :root { --p: #f97316; --s: #ef4444; --bg: #fff7ed; }
-        * { box-sizing: border-box; font-family: 'Noto Sans Sinhala', sans-serif; }
-        body { background-color: var(--bg); padding: 15px; margin: 0; }
-        
-        .header { 
-            text-align: center; background: linear-gradient(135deg, var(--p), var(--s)); 
-            color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        :root {
+            --primary-yellow: #FEF08A; /* Soft Yellow */
+            --accent-blue: #38BDF8;   /* Light Blue */
+            --dark-blue: #0369A1;
+            --text-dark: #334155;
+            --bg-traditional: #FFFBEB; /* Soft Cream */
         }
 
-        .card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        #map { height: 350px; border-radius: 15px; border: 2px solid #fed7aa; margin: 15px 0; }
+        * { box-sizing: border-box; font-family: 'Noto Sans Sinhala', 'Poppins', sans-serif; }
         
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 30px; border: 1px solid #fdba74; outline: none; }
-        .btn-main { background: linear-gradient(135deg, var(--p), var(--s)); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-main:hover { transform: scale(1.02); }
-        .btn-gps { background: #0ea5e9; color: white; border: none; font-weight: bold; cursor: pointer; }
+        body { 
+            background-color: var(--bg-traditional); 
+            /* Subtle traditional pattern texture (base64 for simplicity) */
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3Y%3Cg fill='%23fdba74' fill-opacity='0.1' fill-rule='evenodd'%3Y%3Ccircle cx='3' cy='3' r='3'/%3Y%3Ccircle cx='13' cy='13' r='3'/%3Y%3C/g%3Y%3C/svg%3Y");
+            padding: 10px; margin: 0; color: var(--text-dark); 
+        }
+        
+        .header { 
+            text-align: center; background-color: var(--primary-yellow); 
+            padding: 20px; border-radius: 20px; margin-bottom: 20px;
+            border: 2px solid #fdba74;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
 
-        .event-card { border-left: 5px solid var(--p); padding: 15px; background: #fffcf9; margin-bottom: 15px; border-radius: 10px; }
-        .tag { font-size: 0.8rem; background: #fef08a; padding: 3px 10px; border-radius: 15px; font-weight: bold; }
+        .header h1 { color: #854d0e; margin: 0; font-size: 1.8rem; }
+        .header p { color: #a16207; margin: 5px 0 0 0; }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* Submission Form Card */
+        .card { 
+            background: white; padding: 20px; border-radius: 25px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 20px; 
+            border: 1px solid #fef3c7;
+        }
+        
+        h3.section-title { 
+            color: var(--dark-blue); border-bottom: 3px solid var(--accent-blue); 
+            display: inline-block; padding-bottom: 5px; margin-top: 0;
+        }
+
+        /* Form Inputs */
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #fdba74; outline: none; font-size: 1rem; }
+        input:focus, select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
+        
+        /* Map and GPS */
+        #map { height: 300px; border-radius: 15px; border: 2px solid #fed7aa; margin: 15px 0; z-index: 1; }
+        
+        /* Buttons */
+        .btn { border: none; font-weight: bold; cursor: pointer; transition: 0.2s; border-radius: 30px; }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-main { background-color: var(--accent-blue); color: white; }
+        .btn-main:hover { background-color: #0ea5e9; }
+        
+        .btn-gps { background-color: #fff; color: var(--dark-blue); border: 2px solid var(--accent-blue); }
+        .btn-gps:hover { background-color: #f0f9ff; }
+
+        /* Tables for 9 Provinces */
+        .province-section { margin-bottom: 25px; }
+        .province-name { background-color: var(--primary-yellow); padding: 10px; border-radius: 10px; color: #854d0e; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+        th { background-color: #f0f9ff; color: var(--dark-blue); font-weight: bold; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #fefce8; }
+
+        .btn-view { padding: 6px 12px; font-size: 0.8rem; background: var(--accent-blue); color: white; border-radius: 20px; }
+
+        @media (max-width: 600px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr { border: 1px solid #ccc; margin-bottom: 10px; border-radius: 8px; }
+            td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; text-align: right; }
+            td:before { position: absolute; top: 12px; left: 12px; width: 45%; padding-right: 10px; white-space: nowrap; content: attr(data-label); font-weight: bold; color: var(--dark-blue); text-align: left; }
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>🌞 අවුරුදු උත්සව සෙවුම - 2026</h1>
-        <p>ඔබේ ප්‍රදේශයේ උත්සව සිතියමට එක් කරන්න</p>
+        <h1>🌞 සිංහල සහ දෙමළ අලුත් අවුරුදු Map - 2026</h1>
+        <p>ඔබේ ප්‍රදේශයේ අවුරුදු උත්සව හැමෝටම කියන්න එක් කරන්න</p>
     </div>
 
-    <div class="card">
-        <h3>📍 උත්සවයක් එක් කරන්න</h3>
-        <input type="text" id="eventName" placeholder="උත්සවයේ නම (උදා: බක්මහ උළෙල)">
-        <input type="datetime-local" id="eventDate">
+    <div class="container">
         
-        <button class="btn-gps" onclick="getLocation()">🎯 මගේ වත්මන් ස්ථානය ගන්න (GPS)</button>
-        <p style="font-size: 0.8rem; color: #666; text-align: center;">හෝ Map එකෙන් තැනක් සර්ච් කරන්න</p>
-        
-        <div id="map"></div>
-        <p id="locStatus" style="color: #16a34a; font-size: 0.9rem; font-weight: bold;"></p>
-        
-        <button class="btn-main" onclick="publishEvent()">සජීවීව පබ්ලිෂ් කරන්න</button>
-    </div>
+        <div class="card">
+            <h3 class="section-title">✏️ උත්සවයක් එක් කරන්න</h3>
+            <input type="text" id="eventName" placeholder="උත්සවයේ නම (උදා: බක්මහ උළෙල)">
+            <input type="datetime-local" id="eventDate">
+            
+            <select id="province">
+                <option value="" disabled selected>පළාත තෝරන්න</option>
+                <option value="Western">බස්නාහිර (Western)</option>
+                <option value="Central">මධ්‍යම (Central)</option>
+                <option value="Southern">දකුණ (Southern)</option>
+                <option value="Northern">උතුර (Northern)</option>
+                <option value="Eastern">නැගෙනහිර (Eastern)</option>
+                <option value="North Western">වයඹ (North Western)</option>
+                <option value="North Central">උතුරු මැද (North Central)</option>
+                <option value="Uva">ඌව (Uva)</option>
+                <option value="Sabaragamuwa">සබරගමුව (Sabaragamuwa)</option>
+            </select>
 
-    <div class="card">
-        <h3>📅 ඉදිරි උත්සව (Live Feed)</h3>
-        <div id="eventFeed">දත්ත පූරණය වෙමින් පවතී...</div>
+            <button class="btn btn-gps" onclick="getLocation()">🎯 මගේ වත්මන් ස්ථානය ගන්න (GPS)</button>
+            <p style="font-size: 0.8rem; color: #666; text-align: center; margin: 5px 0;">හෝ Map එක මත Click කර ස්ථානය සලකුණු කරන්න</p>
+            
+            <div id="map"></div>
+            <p id="locStatus" style="color: #16a34a; font-size: 0.9rem; text-align:center; font-weight: bold;"></p>
+            
+            <button class="btn btn-main" onclick="publishEvent()">පබ්ලිෂ් කරන්න (Publish)</button>
+        </div>
+
+        <div class="card">
+            <h3 class="section-title">📅 පළාත් අනුව උත්සව ලැයිස්තුව</h3>
+            <div id="provinceTables">
+                <p>දත්ත පූරණය වෙමින් පවතී...</p>
+                </div>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ඔබ ලබාදුන් Config එක
+        // --- ඔබ ලබාදුන් CONFIG එක ---
         const firebaseConfig = {
             apiKey: "AIzaSyDt3OFSuDiNAZrHN9YpRsFW7ZxUQ5_QbsE",
             authDomain: "avurudu-event-tracker.firebaseapp.com",
@@ -76,31 +152,30 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Map පාලනය
+        // --- Map Setup ---
         var map = L.map('map').setView([7.8731, 80.7718], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
         
         var marker;
         var selectedLat, selectedLng;
 
-        // Search Bar එක (Geocoder)
-        import { } from "https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js";
-        const geocoder = L.Control.geocoder({ defaultMarkGeocode: false })
-            .on('markgeocode', function(e) {
-                updateMarker(e.geocode.center.lat, e.geocode.center.lng, e.geocode.name);
-                map.setView(e.geocode.center, 15);
-            }).addTo(map);
-
-        // GPS හරහා ස්ථානය ලබා ගැනීම
+        // GPS Location Getting
         window.getLocation = function() {
             if (navigator.geolocation) {
+                document.getElementById("locStatus").innerText = "ස්ථානය ලබාගනිමින්...";
                 navigator.geolocation.getCurrentPosition((pos) => {
                     updateMarker(pos.coords.latitude, pos.coords.longitude, "ඔබේ වත්මන් ස්ථානය");
                     map.setView([pos.coords.latitude, pos.coords.longitude], 15);
-                }, () => alert("GPS ලබා ගැනීමට නොහැකි විය. කරුණාකර අවසර දෙන්න."));
+                }, () => {
+                    alert("GPS ලබා ගැනීමට නොහැකි විය. කරුණාකර අවසර දෙන්න.");
+                    document.getElementById("locStatus").innerText = "";
+                });
             }
         };
 
+        // Marker update function
         function updateMarker(lat, lng, msg) {
             selectedLat = lat; selectedLng = lng;
             if (marker) map.removeLayer(marker);
@@ -108,51 +183,107 @@
             document.getElementById("locStatus").innerText = "✔ ස්ථානය සලකුණු කරගන්නා ලදී!";
         }
 
+        // Map click to tag location
         map.on('click', (e) => updateMarker(e.latlng.lat, e.latlng.lng, "තෝරාගත් ස්ථානය"));
 
-        // දත්ත යැවීම
+        // --- Data Submit Function ---
         window.publishEvent = async function() {
             const name = document.getElementById("eventName").value;
             const date = document.getElementById("eventDate").value;
+            const province = document.getElementById("province").value;
 
-            if(!name || !date || !selectedLat) return alert("කරුණාකර සියලු විස්තර පුරවන්න!");
+            if(!name || !date || !province || !selectedLat) return alert("කරුණාකර සියලු විස්තර පුරවා ස්ථානය සලකුණු කරන්න!");
 
             try {
                 await addDoc(collection(db, "events"), {
-                    name, date, lat: selectedLat, lng: selectedLng, createdAt: new Date()
+                    name, date, province, lat: selectedLat, lng: selectedLng, createdAt: new Date()
                 });
-                alert("සාර්ථකව පබ්ලිෂ් වුනා!");
+                alert("ඔබේ උත්සවය සාර්ථකව පබ්ලිෂ් කළා!");
+                // Clear Form
                 document.getElementById("eventName").value = "";
-            } catch (e) { alert("දෝෂයක් ඇතිවිය: " + e.message); }
+                document.getElementById("province").value = "";
+                if(marker) map.removeLayer(marker);
+                document.getElementById("locStatus").innerText = "";
+                selectedLat = null;
+            } catch (e) { alert("Error: " + e.message); }
         };
 
-        // දත්ත ගෙන්වා ගැනීම (Real-time)
-        const q = query(collection(db, "events"), orderBy("createdAt", "desc"));
+        // --- Provinces Setup ---
+        const provinces = {
+            "Western": "බස්නාහිර (Western)", "Central": "මධ්‍යම (Central)", "Southern": "දකුණ (Southern)",
+            "Northern": "උතුර (Northern)", "Eastern": "නැගෙනහිර (Eastern)", "North Western": "වයඹ (North Western)",
+            "North Central": "උතුරු මැද (North Central)", "Uva": "ඌව (Uva)", "Sabaragamuwa": "සබරගමුව (Sabaragamuwa)"
+        };
+
+        // --- Data Retrieve Function (Real-time) ---
+        const q = query(collection(db, "events"), orderBy("date", "asc"));
         onSnapshot(q, (snapshot) => {
-            const feed = document.getElementById("eventFeed");
-            feed.innerHTML = "";
+            const container = document.getElementById("provinceTables");
+            container.innerHTML = "";
+
+            // Create 9 empty arrays for provinces
+            const dataByProvince = {};
+            Object.keys(provinces).forEach(p => dataByProvince[p] = []);
+
+            // Sort data into provinces
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                feed.innerHTML += `
-                    <div class="event-card">
-                        <span class="tag">${new Date(data.date).toLocaleString()}</span>
-                        <h4>${data.name}</h4>
-                        <button class="btn-main" style="padding:5px; font-size:0.8rem; width:auto;" 
-                                onclick="focusOnMap(${data.lat}, ${data.lng}, '${data.name}')">සිතියමේ බලන්න</button>
-                    </div>
-                `;
-                L.marker([data.lat, data.lng]).addTo(map).bindPopup(data.name);
+                if(dataByProvince[data.province]) {
+                    dataByProvince[data.province].push(data);
+                }
+                // Add marker to map for each event
+                L.marker([data.lat, data.lng]).addTo(map).bindPopup(`<b>${data.name}</b><br>${new Date(data.date).toLocaleString()}`);
             });
+
+            // Generate HTML for each province
+            Object.keys(provinces).forEach(key => {
+                const events = dataByProvince[key];
+                if (events.length > 0) {
+                    let rows = "";
+                    events.forEach(ev => {
+                        rows += `
+                            <tr>
+                                <td data-label="උත්සවය">${ev.name}</td>
+                                <td data-label="දිනය/වේලාව">${new Date(ev.date).toLocaleString()}</td>
+                                <td data-label="ක්‍රියා"><button class="btn btn-view" onclick="focusOnMap(${ev.lat}, ${ev.lng}, '${ev.name}')">සිතියමේ බලන්න</button></td>
+                            </tr>
+                        `;
+                    });
+
+                    container.innerHTML += `
+                        <div class="province-section">
+                            <div class="province-name">${provinces[key]}</div>
+                            <table>
+                                thead>
+                                    <tr>
+                                        <th>උත්සවය</th>
+                                        <th>දිනය/වේලාව</th>
+                                        <th>ක්‍රියා</th>
+                                    </tr>
+                                </thead>
+                                tbody>${rows}</tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            });
+
+            if (snapshot.empty) {
+                container.innerHTML = "<p style='text-align:center;'>තවම උත්සව ඇතුළත් කර නැත.</p>";
+            }
         });
 
+        // Global function to scroll to map and focus
         window.focusOnMap = (lat, lng, name) => {
-            map.setView([lat, lng], 15);
-            L.popup().setLatLng([lat, lng]).setContent(name).openOn(map);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            map.setView([lat, lng], 16);
+            L.popup().setLatLng([lat, lng]).setContent(`<b>${name}</b>`).openOn(map);
+            window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
         };
+
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 </body>
 </html>
